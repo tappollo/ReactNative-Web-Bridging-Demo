@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Page Title</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.5.16/dist/vue.js"></script>
+    <style>
+body { padding: 1.5rem; } 
+button { margin-bottom: 1rem; }
+    </style>
+  </head>
+  <body>
+    <div class="callout alert margin-bottom-2">
+      <p class="text-center">Please note that this will not cross the limit, currently set at <strong>0</strong> to <strong>20</strong>!</p>
+    </div>
+
+    <div class="flex-container align-center">
+      <div id="app">
+        <!-- Increase Counter, with an `increaseLimit` of 20 -->
+        <button @click="increaseCounter(20)" class="button rounded shadow success">
+          Increase
+        </button>
+        <!-- Decrease Counter, with an `decreaseLimit` of 0 -->
+        <button @click="decreaseCounter(0)" class="button rounded shadow warning">
+          Decrease
+        </button>
+        <button @click="resetCounter" class="button rounded shadow alert">
+          Reset
+        </button>
+        <p class="text-center">
+        Counter: {{ state.counter }} <br> Result: {{ output }} <br>
+        </p>
+      </div>
+    </div>
+  </body>
+  <script>
+    new Vue({
+      el: '#app',
+      data: {
+        state: {
+          counter: 0,
+        },
+      },
+      methods: {
+        increaseCounter(increaseLimit) {
+          if (this.state.counter < increaseLimit) this.state.counter++;
+          window.postMessage(JSON.stringify(this.state));
+        },
+        decreaseCounter(decreaseLimit) {
+          if (this.state.counter > decreaseLimit) this.state.counter--;
+          window.postMessage(JSON.stringify(this.state));
+        },
+        resetCounter() {
+          this.state.counter = 0;
+          window.postMessage(JSON.stringify(this.state));
+        },
+        handleMessage(msg) {
+          let state = JSON.parse(msg.data);
+          this.state.counter = state.counter;
+        },
+      },
+      created() {
+        document.addEventListener("message", this.handleMessage);
+      },
+      computed: {
+        output() {
+          return this.state.counter >= 10 ? '10 or more' : 'Less than 10';
+        }
+      }
+    });
+  </script>
+</html>
